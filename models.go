@@ -1,10 +1,18 @@
+package main
+
 type User struct {
-	Username string
-	Password string
+	Name         string
+	Surname      string
+	Email        string
+	Phone_Number string
+	Username     string
+	Password     string
+	Auntificated bool
 }
 
 type Item struct {
-	Name   string
+	Name string
+	// Photo
 	Price  float64
 	Rating float64
 }
