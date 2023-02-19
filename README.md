@@ -1,7 +1,9 @@
 # GolangApp
 
 * Project created by: 
-    - Pan Dmitriy 200103451
-    - Shukirov Bekkhan 200103041
-    - Ushkirbek Dastan 200103120
-    - Sadykova Nazerke 
+    - 200103451_Pan Dmitriy 
+    - 200103041_Shukirov Bekkhan 
+    - 200103120_Ushkirbek Dastan 
+    - 200103365_Sadykova Nazerke 
+
+## E-commerce app of ...
