@@ -12,47 +12,6 @@ import (
 )
 
 var host = ":8081"
-
-//type Item struct {
-//	Brand string
-//	Model string
-//	Type  string
-//	Price string
-//}
-
-/*
-func registrationPage(w http.ResponseWriter, r *http.Request) {
-	dima := User{"pbpan", "admin", "Dmitriy", "Pan", "dfsnkpw", 20}
-	tmpl, _ := template.ParseFiles("templates/registration.html")
-	tmpl.Execute(w, dima)
-	fmt.Println("Endpoint hit registration page")
-}
-func mainPage(w http.ResponseWriter, r *http.Request) {
-	dima := User{"pbpan", "admin", "Dmitriy", "Pan", "dfsnkpw", 20}
-	tmpl, _ := template.ParseFiles("templates/index.html")
-	tmpl.Execute(w, dima)
-	fmt.Println("Endpoint hit main page")
-}*/
-
-//func loginPage(w http.ResponseWriter, r *http.Request) {
-//	tmpl, _ := template.ParseFiles("static/login.html")
-//	tmpl.Execute(w, r)
-//	fmt.Println("Endpoint hit login page")
-//}
-
-/*TEST FUNCTIONS TO SHOW CREATE UPDATE AND SO ON*/
-//func getUser(w http.ResponseWriter, r *http.Request) {
-//
-//}
-//func (u User) setNewNickname(newNickName string) {
-//	u.Nickname = newNickName
-//}
-
-/*END TEST FUNCTIONS TO SHOW CREATE UPDATE AND SO ON*/
-
-/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-/*////////////////////////////PUT BELOW IN OTHER GO FILE////////////////////////////////////////////////////////*/
 var db *gorm.DB
 var err error
 
