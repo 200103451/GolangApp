@@ -1,35 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="../static/css/style.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-    <div class = "header">
-        <div class = "header-button">
-            <a href="index.html">Main</a>
-        </div>
-        <div class = "header-button">
-            <a href="registration.html">Registration</a>
-        </div>
-        <div class = "header-button">
-            <a href="login.html">Login</a>
-        </div>
-    </div>
-    <div class = "badge">
-        <a>Login</a>
-    </div>
-    <div class = "login-information">
-        <div class = "info-container">
-            <h1>Hello {{}} {{}}!!!</h1>
-            <h2>Your nickname is - {{}}</h2> <br>
-            <p>Your password is - {{}}</p> <br>
-            <h2>Your age is - {{}}</h2> <br>
-        </div>
-    </div>
+{{ define "login" }}
+{{ template "header" }}
 
-</body>
-</html>
+<div class = "badge">
+    <a>Login</a>
+</div>
+
+<div class = "container">
+    <div class = "info-container">
+        <h2>Input data below</h2>
+        <form method="post" action="/check_user">
+            <label>Write nickname</label> <br>
+            <input type="text" name="nickname" id="nickname"> <br>
+            <label>Write password</label> <br>
+            <input type="text" name="password" id="password"> <br>
+            <button>login</button>
+        </form>
+    </div>
+</div>
+
+{{ template "footer" }}
+{{ end }}

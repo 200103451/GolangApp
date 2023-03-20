@@ -1,42 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Registration page</title>
-    <link href="../static/css/style.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-    <div class = "header">
-            <div class = "header-button">
-                <a href="{{.registrationPage}}">Main</a>
-            </div>
-            <div class = "header-button">
-                <a href="registration.html">Registration</a>
-            </div>
-            <div class = "header-button">
-                <a href="login.html">Login</a>
-            </div>
-    </div>
-    <div class = "badge">
-        <a>Registration</a>
-    </div>
+{{ define "registration" }}
+
+{{ template "header" }}
+
     <div class = "container">
         <div class = "info-container">
             <h2>Input data below</h2>
-            <form method="post" action="postform">
+            <form method="post" action="/save_user">
                 <label>Write nickname</label> <br>
-                <input type="text" name="username"> <br>
+                <input type="text" name="nickname" id="nickname"> <br>
                 <label>Write firstname</label> <br>
-                <input type="text" name="firstname"> <br>
+                <input type="text" name="firstname" id="firstname"> <br>
                 <label>Write lastname</label> <br>
-                <input type="text" name="lastname"> <br>
+                <input type="text" name="lastname" id="lastname"> <br>
                 <label>Write age</label> <br>
-                <input type="text" name="age"> <br>
+                <input type="text" name="age" id="age"> <br>
                 <label>Write password</label> <br>
-                <input type="text" name="password"> <br>
+                <input type="text" name="password" id="password"> <br>
                 <input type="submit" value="Submit">
             </form>
         </div>
     </div>
-</body>
-</html>
+
+{{ template "footer" }}
+
+{{ end }}
