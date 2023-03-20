@@ -1,0 +1,22 @@
+{{ define "login" }}
+{{ template "header" }}
+
+<div class = "badge">
+    <a>Login</a>
+</div>
+
+<div class = "container">
+    <div class = "info-container">
+        <h2>Input data below</h2>
+        <form method="post" action="/check_user">
+            <label>Write nickname</label> <br>
+            <input type="text" name="nickname" id="nickname"> <br>
+            <label>Write password</label> <br>
+            <input type="text" name="password" id="password"> <br>
+            <button>login</button>
+        </form>
+    </div>
+</div>
+
+{{ template "footer" }}
+{{ end }}

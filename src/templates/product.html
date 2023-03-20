@@ -1,0 +1,16 @@
+{{ define "product" }}
+{{template "header"}}
+<div class="product">
+    <div class="product-image">
+        <img src="/static/images/products/{{.Photo}}" alt="Product Photo">
+    </div>
+    <div class="product-info">
+        <h1 class="product-brand">{{.Brand}}</h1>
+        <h2 class="product-name">{{.Type}}</h2>
+        <p class="product-description">{{.Description}}</p>
+        <p class="product-price">$ {{.Price}}</p>
+        <button id="go-back">Go Back</button>
+    </div>
+</div>
+{{template "footer"}}
+{{ end }}

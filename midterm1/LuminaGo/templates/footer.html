@@ -1,0 +1,28 @@
+{{ define "footer" }}
+<script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
+<script>
+    var glide = new Glide('.glide', {
+        type: 'carousel',
+        perView: 3,
+        focusAt: 'center',
+        gap: 20,
+        breakpoints: {
+            1024: {
+                perView: 2
+            },
+            768: {
+                perView: 1
+            }
+        }
+    });
+
+    glide.mount();
+</script>
+<script>
+    document.getElementById("go-back").addEventListener("click", function() {
+        window.location.href = document.referrer;
+    });
+</script>
+</body>
+</html>
+{{ end }}

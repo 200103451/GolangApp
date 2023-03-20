@@ -1,0 +1,18 @@
+{{ define "smallcard" }}
+<div class="card">
+  <div class="card-header">
+    <h2>{{.Brand}}</h2>
+  </div>
+  <div class="card-image">
+    <img src="/static/images/products/{{.Photo}}" alt="some product">
+  </div>
+  <p>Price: ${{.Price}}</p>
+  <div class="card-description">
+    {{ .Description }}
+  </div>
+  <form>
+    <button formaction="/product/{{.Id}}">Product Overview</button>
+    <button>Add to cart</button>
+  </form>
+</div>
+{{ end }}
