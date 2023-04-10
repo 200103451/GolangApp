@@ -19,6 +19,8 @@ type Product struct {
 	Description string
 	Price       float32
 	Photo       string
+	Rating      uint16
+	RatingCount uint16
 }
 
 var products = []Product{}
@@ -34,7 +36,7 @@ func getProductData(db *sql.DB) ([]Product, error) {
 	var item []Product
 	for rows.Next() {
 		var product Product
-		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo)
+		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo, &product.Rating, &product.RatingCount)
 		if err != nil {
 			return nil, err
 		}
@@ -138,6 +140,7 @@ func checkUser(w http.ResponseWriter, r *http.Request) {
 func catalog(w http.ResponseWriter, r *http.Request) {
 	typeFilter := r.URL.Query().Get("type")
 	brandFilter := r.URL.Query().Get("brand")
+	sortValue := r.URL.Query().Get("sorting")
 
 	t, err := template.ParseFiles("templates/header.html", "templates/footer.html", "templates/smallcard.html", "templates/filters.html")
 	if err != nil {
@@ -161,6 +164,9 @@ func catalog(w http.ResponseWriter, r *http.Request) {
 			query += " AND "
 		}
 		query += "`brand`='" + brandFilter + "'"
+	}
+	if sortValue != "" {
+		query += " ORDER BY `" + sortValue + "` DESC"
 	}
 
 	rows, err := db.Query(query)
@@ -195,8 +201,10 @@ func catalog(w http.ResponseWriter, r *http.Request) {
 		var description string
 		var price float32
 		var photoAddress string
+		var rating uint16
+		var ratingCount uint16
 
-		err = rows.Scan(&id, &brand, &productType, &description, &price, &photoAddress)
+		err = rows.Scan(&id, &brand, &productType, &description, &price, &photoAddress, &rating, &ratingCount)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -240,7 +248,7 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 	var item Product
 	for rows.Next() {
 		var product Product
-		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo)
+		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo, &product.Rating, &product.RatingCount)
 		if err != nil {
 			panic(err)
 		}

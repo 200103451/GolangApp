@@ -5,14 +5,16 @@
         <form action="/catalog" method="GET">
             <input type="text" name="brand" placeholder="input brand of the product"> <br> <br>
             <select name="type">
-                <option type="checkbox" value="">all products</option>
+                <option type="checkbox" value="">Choose type of product</option>
                 <option type="checkbox" value="Skin Care kit">Skin Care kit</option> <br>
                 <option type="checkbox" value="Hair">Hair</option> <br>
                 <option type="checkbox" value="Cleanser">Cleanser</option> <br>
                 <option type="checkbox" value="Serum">Serum</option> <br>
-            </select>
-
-            <button type="submit">Filter</button> <button type="submit" value="">Reset filters</button>
+            </select> <br>
+            <input type="checkbox" name = "sorting" value="price">Sort by price</input> <br>
+            <input type="checkbox" name = "sorting" value="rating">Sort by rating</input> <br>
+            <button type="submit">Filter</button> <br>
+            <button type="submit" value="">Reset filters</button>
         </form>
     </div>
 </div>
