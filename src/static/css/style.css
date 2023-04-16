@@ -226,10 +226,11 @@ body {
     align-items: center;
     justify-content: space-around;
     margin: 20px;
+    margin-bottom: 50px;
     padding: 20px;
     border: 1px solid #ddd;
 }
-.product-info{
+.product-info {
     width: 55%;
     display: flex;
     flex-direction: column;
@@ -284,3 +285,64 @@ body {
     display: flex;
     flex-direction: column;
 }
+/* comment part */
+.form-for-comments{
+    margin: 20px 100px;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.form-for-comments label {
+    display: block;
+    margin-bottom: 5px;
+}
+.form-for-comments input[type="text"], textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+.form-for-comments input[type="submit"] {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.form-for-comments input[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+
+.all-comments {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 100px;
+}
+
+.comment-container {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding: 15px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.comment-meta {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+.comment-author {
+    font-weight: bold;
+}
+.comment-text {
+    margin-top: 5px;
+}
+/* end comments part */

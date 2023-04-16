@@ -1,16 +1,46 @@
 {{ define "product" }}
-{{template "header"}}
+{{ template "header" . }}
+
 <div class="product">
     <div class="product-image">
-        <img src="/static/images/products/{{.Photo}}" alt="Product Photo">
+        <img src="/static/images/products/{{.Product.Photo}}" alt="Product Photo">
     </div>
     <div class="product-info">
-        <h1 class="product-brand">{{.Brand}}</h1>
-        <h2 class="product-name">{{.Type}}</h2>
-        <p class="product-description">{{.Description}}</p>
-        <p class="product-price">$ {{.Price}}</p>
+        <h1 class="product-brand">{{.Product.Brand}}</h1>
+        <h2 class="product-name">{{.Product.Type}}</h2>
+        <p class="product-description">{{.Product.Description}}</p>
+        <p class="product-price">$ {{.Product.Price}}</p>
+        <p>{{.Product.Id}}</p>
         <button id="go-back">Go Back</button>
     </div>
 </div>
-{{template "footer"}}
+
+<div class="form-for-comments">
+    <h1>Product Comment Form</h1>
+    <form action="/save_comment" method="post">
+        <label for="nickname">Name:</label>
+        <input type="text" id="nickname" name="nickname" required>
+        <input type="hidden" id="product_id" name="product_id" value="{{.Product.Id}}">
+        <label for="comment_text">Comment:</label>
+        <textarea id="comment_text" name="comment_text" rows="5" required></textarea>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+
+<div class="all-comments">
+    {{ range .Comments }}
+    <div class="comment-container">
+        <div class="comment-meta">
+            <span class="comment-author">Author: {{.UserNickname}}</span>
+        </div>
+        <div class="comment-text">
+            <p>{{.CommentText}}</p>
+        </div>
+    </div>
+    {{ end }}
+</div>
+
+
+{{template "footer" . }}
 {{ end }}

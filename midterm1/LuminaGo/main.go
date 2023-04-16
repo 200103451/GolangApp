@@ -227,7 +227,7 @@ func catalog(w http.ResponseWriter, r *http.Request) {
 
 func productFullInfo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	t, err := template.ParseFiles("templates/product.html", "templates/header.html", "templates/footer.html")
+	t, err := template.ParseFiles("templates/product.html", "templates/header.html", "templates/footer.html", "templates/comment.html")
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 	}
@@ -260,7 +260,6 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 
 	t.ExecuteTemplate(w, "product", item)
 }
-
 func handleFunc() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", index).Methods("GET")

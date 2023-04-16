@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -22,8 +23,16 @@ type Product struct {
 	Rating      uint16
 	RatingCount uint16
 }
+type Comment struct {
+	Id           uint16
+	ProductId    uint16
+	CommentText  string
+	UserNickname string
+}
 
+var comments = []Comment{}
 var products = []Product{}
+
 var showProduct = Product{}
 
 func getProductData(db *sql.DB) ([]Product, error) {
@@ -110,6 +119,29 @@ func saveUser(w http.ResponseWriter, r *http.Request) {
 		defer insert.Close()
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+func saveComment(w http.ResponseWriter, r *http.Request) {
+	product_id := r.FormValue("product_id")
+	nickname := r.FormValue("nickname")
+	comment_text := r.FormValue("comment_text")
+
+	if nickname == "" || comment_text == "" {
+		fmt.Fprintf(w, "You didnt write something")
+	} else {
+		db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+
+		insert, err := db.Query(fmt.Sprintf("INSERT INTO `products_comments` (`product_id`,`comment`,`User_nickname`) VALUES('%s','%s','%s')", product_id, comment_text, nickname))
+		if err != nil {
+			panic(err)
+		}
+		defer insert.Close()
+
+		http.Redirect(w, r, "/product/", http.StatusSeeOther)
 	}
 }
 func checkUser(w http.ResponseWriter, r *http.Request) {
@@ -226,6 +258,7 @@ func catalog(w http.ResponseWriter, r *http.Request) {
 }
 
 func productFullInfo(w http.ResponseWriter, r *http.Request) {
+
 	vars := mux.Vars(r)
 	t, err := template.ParseFiles("templates/product.html", "templates/header.html", "templates/footer.html")
 	if err != nil {
@@ -238,7 +271,7 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	//vyborka dannyh
+	//vyborka dannyh about products
 	rows, err := db.Query(fmt.Sprintf("SELECT * FROM `products` WHERE `id` = '%s'", vars["id"]))
 	if err != nil {
 		panic(err)
@@ -258,7 +291,40 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	t.ExecuteTemplate(w, "product", item)
+	//vyborka dannyh about comments
+	rowsComments, err := db.Query(fmt.Sprintf("SELECT * FROM `products_comments` WHERE `product_id` = '%s'", vars["id"]))
+	if err != nil {
+		panic(err)
+	}
+	defer rowsComments.Close()
+
+	var comments []Comment
+	for rowsComments.Next() {
+		var c Comment
+		err = rowsComments.Scan(&c.Id, &c.ProductId, &c.CommentText, &c.UserNickname)
+		if err != nil {
+			panic(err)
+		}
+		comments = append(comments, c)
+	}
+	if err = rows.Err(); err != nil {
+		panic(err)
+	}
+
+	data := struct {
+		Product  Product
+		Comments []Comment
+	}{
+		Product:  item,
+		Comments: comments,
+	}
+	fmt.Println(data)
+
+	err = t.ExecuteTemplate(w, "product", data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func handleFunc() {
@@ -270,6 +336,7 @@ func handleFunc() {
 	r.HandleFunc("/check_user", checkUser).Methods("POST")
 	r.HandleFunc("/catalog", catalog).Methods("GET")
 	r.HandleFunc("/product/{id:[0-9]+}", productFullInfo).Methods("GET")
+	r.HandleFunc("/save_comment", saveComment).Methods("POST")
 
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
