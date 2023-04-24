@@ -1,0 +1,36 @@
+{{ define "header" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main page</title>
+    <link href="../static/css/style.css" rel="stylesheet" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Damion&family=Poppins:ital,wght@0,200;0,300;0,400;1,100;1,300;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
+</head>
+<body>
+
+<div class = "header">
+    <div class = "header-container-first">
+        <h1>LUMINA</h1>
+    </div>
+    <div class = "header-container-second">
+        <div class = "header-button">
+            <a href="/">Main</a>
+        </div>
+        <div class = "header-button">
+            <a href="/catalog">Catalog</a>
+        </div>
+        <div class = "header-button">
+            <a href="/registration">Registration</a>
+        </div>
+        <div class = "header-button">
+            <a href="/login">Login</a>
+        </div>
+    </div>
+</div>
+{{ end }}

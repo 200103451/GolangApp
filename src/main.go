@@ -20,8 +20,9 @@ type Product struct {
 	Description string
 	Price       float32
 	Photo       string
-	Rating      uint16
-	RatingCount uint16
+	RatingCount float32
+	RatingSum   float32
+	Rating      float32
 }
 type Comment struct {
 	Id           uint16
@@ -45,7 +46,7 @@ func getProductData(db *sql.DB) ([]Product, error) {
 	var item []Product
 	for rows.Next() {
 		var product Product
-		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo, &product.Rating, &product.RatingCount)
+		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo, &product.RatingCount, &product.RatingSum, &product.Rating)
 		if err != nil {
 			return nil, err
 		}
@@ -141,7 +142,27 @@ func saveComment(w http.ResponseWriter, r *http.Request) {
 		}
 		defer insert.Close()
 
-		http.Redirect(w, r, "/product/", http.StatusSeeOther)
+		http.Redirect(w, r, "/product/"+product_id+"?", http.StatusSeeOther)
+	}
+}
+func add_rating(w http.ResponseWriter, r *http.Request) {
+	rating := r.FormValue("rating")
+	product_id := r.FormValue("product_id")
+	if rating == "" {
+		fmt.Fprintf(w, "You didnt write something")
+	} else {
+		db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+		insert, err := db.Query(fmt.Sprintf("UPDATE `products` SET `rating_count` = `rating_count`+1, `rating_sum` = `rating_sum`+ '%s', `rating` = `rating_sum`/`rating_count` WHERE `id` = '%s'", rating, product_id))
+		if err != nil {
+			panic(err)
+		}
+		defer insert.Close()
+
+		http.Redirect(w, r, "/product/"+product_id+"?", http.StatusSeeOther)
 	}
 }
 func checkUser(w http.ResponseWriter, r *http.Request) {
@@ -233,10 +254,11 @@ func catalog(w http.ResponseWriter, r *http.Request) {
 		var description string
 		var price float32
 		var photoAddress string
-		var rating uint16
-		var ratingCount uint16
+		var ratingCount float32
+		var ratingSum float32
+		var rating float32
 
-		err = rows.Scan(&id, &brand, &productType, &description, &price, &photoAddress, &rating, &ratingCount)
+		err = rows.Scan(&id, &brand, &productType, &description, &price, &photoAddress, &ratingCount, &ratingSum, &rating)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -281,7 +303,7 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 	var item Product
 	for rows.Next() {
 		var product Product
-		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo, &product.Rating, &product.RatingCount)
+		err = rows.Scan(&product.Id, &product.Brand, &product.Type, &product.Description, &product.Price, &product.Photo, &product.RatingCount, &product.RatingSum, &product.Rating)
 		if err != nil {
 			panic(err)
 		}
@@ -318,7 +340,6 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 		Product:  item,
 		Comments: comments,
 	}
-	fmt.Println(data)
 
 	err = t.ExecuteTemplate(w, "product", data)
 	if err != nil {
@@ -337,6 +358,7 @@ func handleFunc() {
 	r.HandleFunc("/catalog", catalog).Methods("GET")
 	r.HandleFunc("/product/{id:[0-9]+}", productFullInfo).Methods("GET")
 	r.HandleFunc("/save_comment", saveComment).Methods("POST")
+	r.HandleFunc("/add_rating", add_rating).Methods("POST")
 
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
