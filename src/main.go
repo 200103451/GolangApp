@@ -359,7 +359,7 @@ func handleFunc() {
 	r.HandleFunc("/product/{id:[0-9]+}", productFullInfo).Methods("GET")
 	r.HandleFunc("/save_comment", saveComment).Methods("POST")
 	r.HandleFunc("/add_rating", add_rating).Methods("POST")
-
+	
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	fmt.Printf("server is listening on host %s \n", host)
