@@ -30,6 +30,14 @@ type Comment struct {
 	CommentText  string
 	UserNickname string
 }
+type Cart struct {
+	Id           uint16
+	ProductId    uint16
+	ProductBrand string
+	ProductPrice float64
+	ProductPhoto string
+	ProductCount uint16
+}
 
 var comments = []Comment{}
 var products = []Product{}
@@ -269,7 +277,7 @@ func catalog(w http.ResponseWriter, r *http.Request) {
 			count = 0
 		}
 		// write HTML for product row
-		fmt.Fprintf(w, "<div class=\"card\">\n  <div class=\"card-header\">\n    <h2>%s</h2>\n  </div>\n  <div class=\"card-image\">\n    <img src=\"/static/images/products/%s\" alt=\"some product\">\n  </div>\n  <p>Price: $%0.2f</p>\n  <div class=\"card-description\">\n    <p>%s</p>\n  </div>\n  <form>\n    <button formaction=\"/product/%d\">Product Overview</button>\n <button>Add to cart</button>\n  </form>\n</div>", brand, photoAddress, price, description, id)
+		fmt.Fprintf(w, "<div class=\"card\">\n  <div class=\"card-header\">\n    <h2>%s</h2>\n  </div>\n  <div class=\"card-image\">\n    <img src=\"/static/images/products/%s\" alt=\"some product\">\n  </div>\n  <p>Price: $%0.2f</p>\n  <div class=\"card-description\">\n    <p>%s</p>\n  </div>\n  <form>\n    <button formaction=\"/product/%d\">Product Overview</button>\n  </form>\n</div>", brand, photoAddress, price, description, id)
 		count += 1
 	}
 	fmt.Fprintf(w, "</div>")
@@ -347,6 +355,89 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+func cartPage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/cart.html", "templates/header.html", "templates/footer.html")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM `cart`")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var cartItems []Cart
+	totalPrice := 0.00
+
+	for rows.Next() {
+		var cartItem Cart
+		err := rows.Scan(&cartItem.Id, &cartItem.ProductId, &cartItem.ProductBrand, &cartItem.ProductPrice, &cartItem.ProductPhoto, &cartItem.ProductCount)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		cartItems = append(cartItems, cartItem)
+		totalPrice += cartItem.ProductPrice * float64(cartItem.ProductCount)
+	}
+
+	data := struct {
+		CartItems  []Cart
+		TotalPrice float64
+	}{
+		CartItems:  cartItems,
+		TotalPrice: totalPrice,
+	}
+	fmt.Print(data)
+
+	t.ExecuteTemplate(w, "cart", data)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func addItemCart(w http.ResponseWriter, r *http.Request) {
+	productId := r.FormValue("product-id")
+	productBrand := r.FormValue("product-brand")
+	productPrice := r.FormValue("product-price")
+	productPhoto := r.FormValue("product-image")
+	productCount := r.FormValue("product-count")
+
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	insert, err := db.Query(fmt.Sprintf("INSERT INTO `cart` (`product_id`,`product_brand`,`product_price`,`product_photo`,`product_count`) VALUES('%s','%s','%s','%s','%s')", productId, productBrand, productPrice, productPhoto, productCount))
+	if err != nil {
+		panic(err)
+	}
+	defer insert.Close()
+
+	http.Redirect(w, r, "/product/"+productId+"?", http.StatusSeeOther)
+}
+func deleteFromCart(w http.ResponseWriter, r *http.Request) {
+	cartId := r.FormValue("cart-id")
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	insert, err := db.Query(fmt.Sprintf("DELETE FROM `cart` WHERE `id` = '%s'", cartId))
+	if err != nil {
+		panic(err)
+	}
+	defer insert.Close()
+
+	http.Redirect(w, r, "/cart", http.StatusSeeOther)
+}
 
 func handleFunc() {
 	r := mux.NewRouter()
@@ -359,7 +450,10 @@ func handleFunc() {
 	r.HandleFunc("/product/{id:[0-9]+}", productFullInfo).Methods("GET")
 	r.HandleFunc("/save_comment", saveComment).Methods("POST")
 	r.HandleFunc("/add_rating", add_rating).Methods("POST")
-	
+	r.HandleFunc("/cart", cartPage).Methods("GET")
+	r.HandleFunc("/add_item_to_cart", addItemCart).Methods("POST")
+	r.HandleFunc("/delete_item_from_cart", deleteFromCart).Methods("POST")
+
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	fmt.Printf("server is listening on host %s \n", host)

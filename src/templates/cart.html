@@ -1,0 +1,29 @@
+{{ define "cart" }}
+{{ template "header" }}
+
+<div class = "badge">
+    <a>Shopping Cart</a>
+</div>
+
+<div class="cart-container">
+    {{ range .CartItems }}
+    <div class="cart-item">
+        <img src="/static/images/products/{{.ProductPhoto}}" alt="Product 1" class="cart-item-image">
+        <span class="cart-item-title">{{ .ProductBrand }}</span>
+        <span class="cart-item-price">price of product: {{ .ProductPrice }}</span>
+        <span class="cart-item-count">{{ .ProductCount }}</span>
+        <form action="/delete_item_from_cart" method="post">
+            <input type="hidden" value="{{ .Id }}" name="cart-id">
+            <button class="cart-item-remove">Remove</button>
+        </form>
+    </div>
+    {{ end }}
+
+    <div class="cart-total">
+        Total:  {{ .TotalPrice }}
+    </div>
+</div>
+
+
+{{ template "footer" }}
+{{ end }}

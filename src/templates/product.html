@@ -1,5 +1,8 @@
 {{ define "product" }}
 {{ template "header" . }}
+<div class = "badge">
+    <a>Chosen product - {{.Product.Brand}}</a>
+</div>
 
 <div class="product">
     <div class="product-image">
@@ -15,9 +18,19 @@
         <form action="/add_rating" method="POST">
             <input type="hidden" name="product_id" value="{{.Product.Id}}">
             <label for="rating">Put rating of product from 0 to 10:</label>
-            <input type="text" name="rating" id = "rating">
+            <input type="text" name="rating" id="rating">
             <input type="submit" value="Submit">
         </form>
+        <form action="/add_item_to_cart" method="POST">
+            <input type="hidden" name="product-id" value="{{.Product.Id}}">
+            <input type="hidden" name="product-brand" value="{{.Product.Brand}}">
+            <input type="hidden" name="product-price" value="{{.Product.Price}}">
+            <input type="hidden" name="product-image" value="{{.Product.Photo}}">
+            <label for="product-count">Put count of product from:</label>
+            <input type="number" name="product-count" id="product-count" value=1>
+            <input type="submit" value="Add to Cart">
+        </form>
+
         <button id="go-back">Go Back</button>
     </div>
 </div>
