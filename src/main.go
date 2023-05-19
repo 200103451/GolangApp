@@ -97,14 +97,6 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	t.ExecuteTemplate(w, "registration", nil)
 }
-func loginUser(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/login.html", "templates/header.html", "templates/footer.html")
-	if err != nil {
-		fmt.Fprintf(w, err.Error())
-	}
-
-	t.ExecuteTemplate(w, "login", nil)
-}
 func saveUser(w http.ResponseWriter, r *http.Request) {
 	nickname := r.FormValue("nickname")
 	firstname := r.FormValue("firstname")
@@ -130,6 +122,40 @@ func saveUser(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
+func loginUser(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/login.html", "templates/header.html", "templates/footer.html")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+
+	t.ExecuteTemplate(w, "login", nil)
+}
+func checkUser(w http.ResponseWriter, r *http.Request) {
+	nickname := r.FormValue("nickname")
+	password := r.FormValue("password")
+
+	if nickname == "" || password == "" {
+		fmt.Fprintf(w, "You didnt write something")
+	} else {
+		db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+
+		var exists bool
+		err = db.QueryRow(fmt.Sprintf("SELECT EXISTS(SELECT * from `users` WHERE `nickname`='%s' AND `password`='%s')", nickname, password)).Scan(&exists)
+		if err != nil {
+			panic(err)
+		}
+		if exists {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else {
+			fmt.Fprintf(w, "User don't exist")
+		}
+	}
+}
+
 func saveComment(w http.ResponseWriter, r *http.Request) {
 	product_id := r.FormValue("product_id")
 	nickname := r.FormValue("nickname")
@@ -171,31 +197,6 @@ func add_rating(w http.ResponseWriter, r *http.Request) {
 		defer insert.Close()
 
 		http.Redirect(w, r, "/product/"+product_id+"?", http.StatusSeeOther)
-	}
-}
-func checkUser(w http.ResponseWriter, r *http.Request) {
-	nickname := r.FormValue("nickname")
-	password := r.FormValue("password")
-
-	if nickname == "" || password == "" {
-		fmt.Fprintf(w, "You didnt write something")
-	} else {
-		db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
-		if err != nil {
-			panic(err)
-		}
-		defer db.Close()
-
-		var exists bool
-		err = db.QueryRow(fmt.Sprintf("SELECT EXISTS(SELECT * from `users` WHERE `nickname`='%s' AND `password`='%s')", nickname, password)).Scan(&exists)
-		if err != nil {
-			panic(err)
-		}
-		if exists {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-		} else {
-			fmt.Fprintf(w, "User don't exist")
-		}
 	}
 }
 func catalog(w http.ResponseWriter, r *http.Request) {
@@ -286,7 +287,6 @@ func catalog(w http.ResponseWriter, r *http.Request) {
 	err = t.ExecuteTemplate(buf, "footer", nil)
 	fmt.Fprintf(w, "%s", buf.String()) //footer
 }
-
 func productFullInfo(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
@@ -355,6 +355,7 @@ func productFullInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
 func cartPage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/cart.html", "templates/header.html", "templates/footer.html")
 	if err != nil {
@@ -438,6 +439,21 @@ func deleteFromCart(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/cart", http.StatusSeeOther)
 }
+func deleteAllFromCart(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	insert, err := db.Query(fmt.Sprintf("DELETE FROM `cart`"))
+	if err != nil {
+		panic(err)
+	}
+	defer insert.Close()
+
+	http.Redirect(w, r, "/cart", http.StatusFound)
+}
 
 func handleFunc() {
 	r := mux.NewRouter()
@@ -453,6 +469,7 @@ func handleFunc() {
 	r.HandleFunc("/cart", cartPage).Methods("GET")
 	r.HandleFunc("/add_item_to_cart", addItemCart).Methods("POST")
 	r.HandleFunc("/delete_item_from_cart", deleteFromCart).Methods("POST")
+	r.HandleFunc("/buy_smthing", deleteAllFromCart).Methods("POST")
 
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
